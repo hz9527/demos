@@ -24,6 +24,7 @@ multicasted.pipe(filter(({target}) => target.classList.contains('btn')))
   .pipe(map(({target}) => target.classList.item(1)))
   .pipe(filter(key => key in Demo))
   .subscribe(key => {
+    console.clear()
     Demo[key]()
     Desc.el.innerHTML = `${key in DescDocs ? `${DescDocs[key]}\n` : ''}${Demo[key].toString()}`
   })

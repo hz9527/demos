@@ -34,7 +34,7 @@ function $(selector) {
 
 function rewriteLog(dom) {
   const log = console.log
-  const oldClear = window.clear
+  const clear = console.clear
   let preMsg = ''
   console.log = function () {
     const msg = Array.prototype.map.call(arguments, item => {
@@ -48,10 +48,10 @@ function rewriteLog(dom) {
     preMsg += ((preMsg ? '\n' : '') + msg)
     dom.innerHTML = preMsg
   }
-  window.clear = () => {
+  console.clear = () => {
     preMsg = ''
     dom.innerHTML = preMsg
-    oldClear()
+    clear()
   }
 }
 
