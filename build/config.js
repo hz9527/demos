@@ -40,7 +40,8 @@ const CONF = {
   fileDefaultDir: resolve('./src/dist'),
   projects: [
     {name: 'rx', input: '/rxjs/src/index.js', output: '/rxjs/dist', file: `rxdemo${isProd ? '.min' : ''}.js`},
-    {name: 'rxelevator', input: '/rxjs/src/elevator/index.js', output: '/rxjs/dist', file: `rxelevator${isProd ? '.min' : ''}.js`}
+    {name: 'rxelevator', input: '/rxjs/src/elevator/index.js', output: '/rxjs/dist', file: `rxelevator${isProd ? '.min' : ''}.js`},
+    {name: 'event', input: '/rxjs/src/bigEvent/demo/demo.js', output: '/rxjs/dist', file: `bigEvent${isProd ? '.min' : ''}.js`}
   ]
 }
 

@@ -65,17 +65,6 @@ function allocation(target, dir) {
   }
   return change
 }
-function chooseTask(item) { // direction 可能为0
-  // 如果有方向选择顺路最远的，如果没有方向选择最近的
-  const task = Object.keys(Task).map(id => Object.assign({id}, Task[id]))
-  if (task.length === 0) return null
-  if (item.direction === 0) {
-    return task.sort(({cur}, {cur: cur2}) => Math.abs(cur - item.cur) - Math.abs(cur2 - item.cur))[0]
-  } else {
-    return task.filter(({direction}) => direction === item.direction)
-      .sort((({cur}, {cur: cur2}) => Math.abs(cur2 - item.cur) - Math.abs(cur - item.cur)))[0]
-  }
-}
 
 passengerObservable.pipe(filter(data => data.type === -1))
   .subscribe(({id, cur, target}) => {
@@ -94,7 +83,7 @@ let enter = 0
 let out = 0
 passengerObservable.pipe(filter(data => data.type === 0))
   .subscribe(({id, eid, target}) => {
-    // 尝试更新单个任务 & waitTask
+    // 尝试更新任务target & waitTask
     const item = ElevatorData.find(({id}) => id === eid)
     item.counts++
     console.log(`name: ${id}, cur ${item.cur} enter & go ${target} ${++enter}`)
@@ -112,17 +101,13 @@ passengerObservable.pipe(filter(data => data.type === 1))
     const item = ElevatorData.find(({id}) => id === eid)
     item.counts--
     console.log(`name: ${id}, cur ${item.cur} out ${++out}`)
-    // 由于增员可能会修改方向，如果还有task，一定是在满员的时候得不到响应（满员或者方向不对），所以减员后就尝试在此分配
-    const task = chooseTask(item)
-    if (task) {
-      const change = allocation(Task[task.id].cur, Task[task.id].direction)
-      if (change) {
-        const direction = item.direction
-        Object.assign(item, change)
-        direction === 0 && scheduler.observer.next(item)
-      }
-    }
+    // 此时更远方向的人一定在此人上电梯前就订阅或者在target === -1 时更新到了
   })
+elevatorMulticasts.pipe(filter(data => data.target === -1))
+  .subscribe(data => {
+    // 由于第一个订阅，此时乘客还未进出电梯，总之一个原则，当前方向最远的人一定能上电梯
+  })
+
 scheduler.abservable.pipe(delay(STEP))
   .pipe(debounceTime(5))
   .subscribe(data => { // id,cur,direction,target,counts
@@ -130,11 +115,10 @@ scheduler.abservable.pipe(delay(STEP))
     data.cur += data.direction
     if (data.cur === data.target) {
       data.target = -1
-      data.direction = 0
     }
     const {id, cur, direction, counts} = data
     elevatorSubject.next({id, cur, direction, canEnter: counts < MAX_MAN})
-    if (direction !== 0) scheduler.observer.next(data)
+    if (target !== -1) scheduler.observer.next(data) // 由调度器更新 target & direction
     // console.log(`cur floor`, cur)
   })
 elevatorMulticasts.pipe(debounceTime(10))

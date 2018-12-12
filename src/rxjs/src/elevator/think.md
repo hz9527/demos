@@ -24,3 +24,5 @@
 1. 乘客是单播的，只需要告知订阅器 type id [cur target eid] (呼叫需要cur target 进入需要target eid， 出去需要 eid)
 2. 调度器是单播的，只需要告知电梯 id cur direction canEnter
 3. 电梯是多播的，需要告知乘客 id cur canEnter direction
+
+> 呼叫时指派电梯，进入时可能更新最远距离，出去时如果target为-1更新最远距离，target为 -1时更新最远距离可能更改方向
