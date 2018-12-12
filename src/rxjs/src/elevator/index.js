@@ -1,5 +1,5 @@
 import {timer} from 'rxjs'
-import {filter} from 'rxjs/operators'
+import {filter, debounceTime} from 'rxjs/operators'
 import Core from './core'
 import genList from './data'
 
@@ -7,29 +7,27 @@ const getLazyOb = (() => {
   let result = null
   return () => {
     if (!result) {
-      console.log(Core)
       result = Core
     }
     return result
   }
 })()
-
-function sub({cur, target}, {call, multicasts, enter, out, miss}) {
+let pid = 0
+function sub({cur, target}, {passengerSubject, elevatorMulticasts}) {
   const dir = cur - target > 0 ? -1 : 1
-  pull(cur)
-  const enterSub = multicasts.pipe(filter(state => state.cur === cur && state.direction === dir))
+  const id = ++pid
+  passengerSubject.next({type: -1, cur, target, id})
+  const enterSub = elevatorMulticasts
+    .pipe(debounceTime(8)) // 保证先下后上
+    .pipe(filter(({canEnter, cur, direction}) => canEnter && cur === cur && direction * dir > -1))
     .subscribe(state => {
-      if (!state.canEnter) {
-        miss(state, cur)
-      } else {
-        enterSub.unsubscribe()
-        enter(state, target)
-        const outSub = multicasts.pipe(filter(state => state.cur === target))
-          .subscribe(state => {
-            outSub.unsubscribe()
-            out(state)
-          })
-      }
+      enterSub.unsubscribe()
+      passengerSubject.next({type: 0, target, id, eid: state.id})
+      const outSub = elevatorMulticasts.pipe(filter(state => state.cur === target))
+        .subscribe(state => {
+          outSub.unsubscribe()
+          passengerSubject.next({type: 1, id, eid: state.id})
+        })
     })
 }
 

@@ -130,11 +130,53 @@ function demo6() {
 }
 demo6.title = '多播数据的共享性'
 
+function demo7 () {
+  // filter 第二个参数使用，单播
+  const observable = Observable.create(observer => {
+    observer.next(1)
+    observer.next(2)
+  })
+  observable.pipe(filter((v, i) => {
+    console.log(i)
+    return true
+  })).subscribe(v => console.log('subscribe 1', v))
+  observable.pipe(filter((v, i) => {
+    console.log(i)
+    return true
+  })).subscribe(v => console.log('subscribe 2', v))
+}
+
+demo7.title = 'filter'
+
+function demo8 () {
+  // filter 第二个参数使用，多播
+  const source = Observable.create(observer => {
+    observer.next(1)
+    observer.next(2)
+  })
+  const subject = new Subject()
+  const multicasts = source.pipe(multicast(subject))
+  multicasts.pipe(filter((v, i) => {
+    console.log(i)
+    return true
+  })).subscribe(v => console.log('subscribe 1', v))
+  multicasts.pipe(filter((v, i, d) => {
+    console.log(i, d)
+    return true
+  })).subscribe(v => console.log('subscribe 2', v))
+  multicasts.connect()
+  subject.next(3)
+}
+
+demo8.title = 'filter2'
+
 export default {
   demo1,
   demo2,
   demo3,
   demo4,
   demo5,
-  demo6
+  demo6,
+  demo7,
+  demo8
 }

@@ -1,71 +1,149 @@
 import {Observable, Subject} from 'rxjs'
-import {filter, scan, delay, multicast} from 'rxjs/operators'
-import {MAX_MAN, STEP} from './config'
-const state = { // 引用不更改
-  cur: 0, // 只能通过step更新
-  direction: 0, // -1 down; 0 static; 1 up，只能通过step更新
-  _run: false, // 只能通过 call 初始化
-  canEnter: true // 只能通过 enter out 修改
-}
-const source = Observable.create(() => {})
-const subject = new Subject()
-const multicasts = source.pipe(multicast(subject))
+import {filter, scan, delay, multicast, debounceTime} from 'rxjs/operators'
+import {MAX_MAN, STEP, MAX_FLOOR, COUNTS} from './config'
+const noop = () => {console.log('has not subscribe')}
 
-let setState
-Observable.create(observer => {
-  setState = observer.next
-}).subscribe()
-
-// 只关注电梯里还有，修改 task cur direction
-multicasts.pipe(scan((states, {cur, direction}) => ({old: states.now, now: {cur, direction}}), {old: start, now: start}))
-  .pipe(filter(states => {
-    return states.old.direction !== states.now.direction || states.old.cur !== states.now.cur
-  }))
-  .pipe(delay(STEP))
-  .subscribe(() => {
-    if (state.cur === target && nextTarget === -1) {
-      state.direction = 0
-      target = -1
-    } else {
-      state.cur += state.direction
-      if (state.cur === target && nextTarget !== -1) {
-        target = nextTarget
-        nextTarget = -1
-        state.direction *= -1
-      }
-      subject.next(state)
-    }
-    console.log(`当前楼层 ${state.cur}`)
+function factory() {
+  const result = {
+    observer: {next: noop, error: noop, complete: noop}
+  }
+  const abservable = Observable.create(ob => {
+    console.log('pull')
+    result.observer = ob
   })
-multicasts.connect()
+  result.abservable = abservable
+  return result
+}
 
-const data = {go: -1, arrive: -1, counts: 0}
-const enter = (state, target) => {
-  const result = {}
-  if (state.canEnter !== ++data.counts < MAX_MAN) {
-    result.canEnter = false
+function multiFactory() {
+  const subject = new Subject()
+  const multicasts = Observable.create(() => {}).pipe(multicast(subject))
+  multicasts.connect()
+  return {subject, multicasts}
+}
+
+const scheduler = factory()
+const {subject: passengerSubject, multicasts: passengerObservable} = multiFactory()
+const {subject: elevatorSubject, multicasts: elevatorMulticasts} = multiFactory()
+
+const ElevatorData = Array.apply(null, {length: COUNTS}).map((n, i) => ({id: i + 1, cur: 0, direction: 0, counts: 0, target: -1}))
+const Task = {}
+
+function choose(tar, dir) { // dir 一定不为 0
+  // 排除满员、非顺路，选择 target 差距最小的
+  return ElevatorData.filter(({cur, direction, counts, target}) => {
+    if (counts === MAX_MAN) return false;
+    if (target === -1) return true
+    const value = tar - target
+    // direction -1 1 0 dir -1 1 & accross
+    if (direction * dir > -1 && value * dir >= 0) return true
+    return false
+  }).sort(({cur}, {cur: cur2}) => Math.abs(cur - tar) - Math.abs(cur2 - tar))[0]
+}
+function getChange(item, target, dir) {
+  // item.target 可能为 -1 direction 可能为 0
+  let result = {}
+  if (item.direction === 0) {
+    result.direction = item.target === -1 ? item.cur - target > 0 ? -1 : 1 : dir
   }
-  Object.keys(result) > 0 && setState(result)
+  const farthest = item.target === -1 ? target : Math[dir === -1 ? 'min' : 'max'](target, item.target)
+  if (farthest !== item.target) {
+    result.target = farthest
+  }
+  if (Object.keys(result).length !== 0) {
+    result.id = item.id
+  } else {
+    result = null
+  }
+  return result
 }
-const out = (state) => {
-  data.counts--
-  if (!state.canEnter) {
-    setState({canEnter: true})
+function allocation(target, dir) {
+  const result = choose(target, dir)
+  let change = null
+  if (result) {
+    change = getChange(result, target, dir)
+  }
+  return change
+}
+function chooseTask(item) { // direction 可能为0
+  // 如果有方向选择顺路最远的，如果没有方向选择最近的
+  const task = Object.keys(Task).map(id => Object.assign({id}, Task[id]))
+  if (task.length === 0) return null
+  if (item.direction === 0) {
+    return task.sort(({cur}, {cur: cur2}) => Math.abs(cur - item.cur) - Math.abs(cur2 - item.cur))[0]
+  } else {
+    return task.filter(({direction}) => direction === item.direction)
+      .sort((({cur}, {cur: cur2}) => Math.abs(cur2 - item.cur) - Math.abs(cur - item.cur)))[0]
   }
 }
-const call = ((state) => (cur) => {
-  // 当前电梯里的人一定是要下去的，所以只需要比如 go 自己 & arriver 即可
-})(state)
-const miss = (state, cur) => {
 
-}
-
-
-
+passengerObservable.pipe(filter(data => data.type === -1))
+  .subscribe(({id, cur, target}) => {
+    // 尝试分配电梯 & task
+    const direction = target - cur > 0 ? 1 : -1
+    Task[id] = {cur, target, direction}
+    const change = allocation(cur, direction)
+    if (change) {
+      const item = ElevatorData.find(({id}) => id === change.id)
+      const direction = item.direction
+      Object.assign(item, change)
+      direction === 0 && scheduler.observer.next(item)
+    }
+  })
+let enter = 0
+let out = 0
+passengerObservable.pipe(filter(data => data.type === 0))
+  .subscribe(({id, eid, target}) => {
+    // 尝试更新单个任务 & waitTask
+    const item = ElevatorData.find(({id}) => id === eid)
+    item.counts++
+    console.log(`name: ${id}, cur ${item.cur} enter & go ${target} ${++enter}`)
+    const change = getChange(item, target, Task[id].direction)
+    delete Task[id]
+    if (change) {
+      const direction = item.direction
+      Object.assign(item, change)
+      direction === 0 && scheduler.observer.next(item)
+    }
+  })
+passengerObservable.pipe(filter(data => data.type === 1))
+  .subscribe(({id, eid}) => {
+    // 减员
+    const item = ElevatorData.find(({id}) => id === eid)
+    item.counts--
+    console.log(`name: ${id}, cur ${item.cur} out ${++out}`)
+    // 由于增员可能会修改方向，如果还有task，一定是在满员的时候得不到响应（满员或者方向不对），所以减员后就尝试在此分配
+    const task = chooseTask(item)
+    if (task) {
+      const change = allocation(Task[task.id].cur, Task[task.id].direction)
+      if (change) {
+        const direction = item.direction
+        Object.assign(item, change)
+        direction === 0 && scheduler.observer.next(item)
+      }
+    }
+  })
+scheduler.abservable.pipe(delay(STEP))
+  .pipe(debounceTime(5))
+  .subscribe(data => { // id,cur,direction,target,counts
+    // update data & publish
+    data.cur += data.direction
+    if (data.cur === data.target) {
+      data.target = -1
+      data.direction = 0
+    }
+    const {id, cur, direction, counts} = data
+    elevatorSubject.next({id, cur, direction, canEnter: counts < MAX_MAN})
+    if (direction !== 0) scheduler.observer.next(data)
+    // console.log(`cur floor`, cur)
+  })
+elevatorMulticasts.pipe(debounceTime(10))
+  .subscribe(data => {
+    console.log(ElevatorData[0])
+  })
 export default {
-  call,
-  multicasts,
-  enter,
-  out,
-  miss
+  passengerSubject,
+  elevatorMulticasts
 }
+
+// bug 由于电梯传递的是不可变状态，所以当下人后计算了新方向和target而不能传递到进入人那里，导致方向和target不一致
