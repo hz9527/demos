@@ -10,7 +10,27 @@ event.pipe(timer(10))
   .pipe(filter(d => d > 1))
   .pipe(map(v => ({value: v})))
   .on(data => {
-    console.log('timer', data)
+    Promise.resolve('timer is same time')
+      .then(console.log)
+    console.log('timer1', data)
+  })
+event.pipe(timer(5))
+  .pipe(timer(5))
+  .pipe(filter(d => d > 1))
+  .on(data => {
+    Promise.resolve('timer3 is same time').then(console.log)
+    console.log('timer3')
+  })
+event.pipe(timer(10))
+  .pipe(filter(d => d > 1))
+  .on(data => {
+    console.log('timer2')
+  })
+event.pipe(timer(5))
+  .pipe(timer(5))
+  .pipe(filter(d => d > 1))
+  .on(data => {
+    console.log('timer4')
   })
 event.pipe(debounceTime(3))
   .on(data => {

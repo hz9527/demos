@@ -16,14 +16,14 @@ class RemoveEvent {
   }
 }
 
-function schedulerExector(schedulers, data, fn, i = 0) {
+function schedulerExector(schedulers, data, fn, server, i = 0) {
   const scheduler = schedulers[i]
   if (!scheduler) {
     fn(data)
   } else {
     scheduler(data, (newData = data) => {
-      schedulerExector(schedulers, newData, fn, ++i)
-    })
+      schedulerExector(schedulers, newData, fn, server, ++i)
+    }, server)
   }
 }
 

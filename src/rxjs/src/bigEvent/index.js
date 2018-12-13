@@ -1,4 +1,5 @@
-import {noop, RemoveEvent, resolveSubscribe} from './helper.js'
+import {noop, RemoveEvent, resolveSubscribe, schedulerExector} from './helper.js'
+import Server from './builtIn'
 export * from './builtIn'
 
 export default class Event {
@@ -28,9 +29,10 @@ export default class Event {
   emit(data) {
     // 需要 for循环
     const list = this.data.index.slice()
+    const server = new Server()
     for (let i = 0; i < list.length; i++) {
       this.data.content[list[i]].forEach(item => {
-        schedulerExector(item.schedulers, data, item.handler)
+        schedulerExector(item.schedulers, data, item.handler, server)
       })
     }
   }
@@ -39,10 +41,11 @@ export default class Event {
     const content = this.data.content
     this.data.index = []
     this.data.content = {}
+    const server = new Server()
     list.forEach(key => {
       content[key].forEach(item => {
         item[method] ? schedulerExector(item.schedulers, data, item[method]) : cb(data)
-      })
+      }, server)
     })
   }
   complete(data) {
@@ -50,7 +53,7 @@ export default class Event {
   }
   error(err) {
     this._complete('error', data, data => {
-      data && data.constructor === Error && throw new Error('uncatch err')
+      if (data && data.constructor === Error) throw new Error('uncatch err')
     })
   }
 }
