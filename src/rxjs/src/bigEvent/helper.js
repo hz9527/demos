@@ -41,9 +41,38 @@ function resolveSubscribe(data, schedulers) {
   return result
 }
 
+// 通过装饰器实现内部数据隐藏
+// 代理实现内部数据隐藏
+function safeClass(Class) {
+  return function () {
+    const data = {}
+    return new Proxy(new Class(...Array.apply(null, arguments)), {
+      get(target, key) {
+        if (key in data) return data[key]
+        if (target.hasOwnProperty(key)) {
+          return void 0
+        } else {
+          return typeof target[key] === 'function' ? target[key].bind(target) : target[key]
+        }
+      },
+      set(target, key, value) {
+        data[key] = value
+      }
+    })
+  }
+}
+
+function classFactory(Class, safety) {
+  return safety ? safeClass(Class) : function(...arg) {
+    return new Class(...arg)
+  }
+}
+
 export {
   noop,
   RemoveEvent,
   schedulerExector,
-  resolveSubscribe
+  resolveSubscribe,
+  safeClass,
+  classFactory
 }

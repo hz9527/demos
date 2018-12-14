@@ -1,7 +1,8 @@
-import Event, {filter, map, timer, debounceTime, async} from '../index.js'
+import {filter, map, timer, debounceTime, async, saveEvent} from '../index.js'
 
-const event = new Event()
-
+const event = new saveEvent()
+console.log(event.data)
+console.log(event.pipe(filter(() => {})))
 event.on(data => {
   console.log('test')
 })
@@ -21,6 +22,10 @@ event.pipe(timer(5))
     Promise.resolve('timer3 is same time').then(console.log)
     console.log('timer3')
   })
+setTimeout(() => {
+  console.log('test 5ms')
+}, 5)
+event.pipe(timer(5)).on(v => console.log('timer 5ms'))
 event.pipe(timer(10))
   .pipe(filter(d => d > 1))
   .on(data => {
