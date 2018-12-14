@@ -3,18 +3,6 @@ import {filter, scan, delay, multicast, debounceTime, partition, map} from 'rxjs
 import {MAX_MAN, STEP, MAX_FLOOR} from './config'
 const noop = () => {console.log('has not subscribe')}
 
-function factory() {
-  const result = {
-    observer: {next: noop, error: noop, complete: noop}
-  }
-  const abservable = Observable.create(ob => {
-    console.log('pull')
-    result.observer = ob
-  })
-  result.abservable = abservable
-  return result
-}
-
 function multiFactory() {
   const subject = new Subject()
   const multicasts = Observable.create(() => {}).pipe(multicast(subject))
@@ -22,7 +10,6 @@ function multiFactory() {
   return {subject, multicasts}
 }
 
-const scheduler = factory()
 const {subject: schedulerSubject, multicasts: schedulerObservable} = multiFactory()
 const {subject: passengerSubject, multicasts: passengerObservable} = multiFactory()
 const {subject: elevatorSubject, multicasts: elevatorMulticasts} = multiFactory()
@@ -69,11 +56,13 @@ passengerObservable.pipe(filter(data => data.type === 0))
     ElevatorData.target = Math[key](target, ElevatorData.target)
     ElevatorData.counts++
     delete Task[id]
+    console.log(`enter ${id}, cur: ${ElevatorData.cur}, target: ${target}`)
     elevatorSubject.next(getMsg(ElevatorData))
   })
 passengerObservable.pipe(filter(data => data.type === 1))
   .subscribe(({id, eid}) => {
     // 减员
+    console.log(`out ${id}, cur: ${ElevatorData.cur}`)
     ElevatorData.counts--
     elevatorSubject.next(getMsg(ElevatorData))
   })
@@ -94,7 +83,8 @@ schedulerObservable.pipe(filter(data => data.target === -1 && data.direction !==
     schedulerSubject.next(data)
   })
 
-schedulerObservable.pipe(filter(data => data.target !== -1))
+schedulerObservable.pipe(debounceTime(5))
+  .pipe(filter(data => data.target !== -1))
   .pipe(delay(STEP))
   .subscribe(data => { // {id,cur,direction,target,counts} update data & publish
     data.cur += data.direction
@@ -103,17 +93,15 @@ schedulerObservable.pipe(filter(data => data.target !== -1))
     schedulerSubject.next(data) // 由调度器更新 target & direction
   })
 
-elevatorMulticasts
-  .subscribe(data => {
-    console.log(ElevatorData)
-  })
+elevatorMulticasts.subscribe(data => {
+  console.log(JSON.stringify(ElevatorData))
+})
 
 const press = ((pid) => ({cur, target}) => {
   const dir = cur - target > 0 ? -1 : 1
   const id = ++pid
   passengerSubject.next({type: -1, cur, target, id})
-  let enterSub = elevatorMulticasts.pipe(debounceTime(5)) // 保证先下后上
-    .pipe(filter(({canEnter, cur, direction}) => canEnter && cur === cur && direction === dir))
+  let enterSub = elevatorMulticasts.pipe(filter(({canEnter, cur: eCur, direction}) => canEnter && cur === eCur && direction === dir))
     .subscribe(state => {
       enterSub.unsubscribe()
       enterSub = null
@@ -130,5 +118,3 @@ const press = ((pid) => ({cur, target}) => {
 export default {
   press
 }
-
-// bug 由于电梯传递的是不可变状态，所以当下人后计算了新方向和target而不能传递到进入人那里，导致方向和target不一致
