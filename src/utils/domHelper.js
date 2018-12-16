@@ -44,6 +44,7 @@ function rewriteLog(dom) {
           return JSON.stringify(item, void 0, 2)
         } catch(err) {
           log(err)
+          return `<b class="error">log: has some Error</b>`
         }
       }
       return item

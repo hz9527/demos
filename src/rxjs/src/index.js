@@ -17,7 +17,7 @@ const observable = fromEvent(document, 'click');
 observable.pipe(filter(({target}) => target.classList.contains(CONF.itemTitle)
  && target.parentNode.classList.contains(CONF.itemCon)))
   .subscribe(e => {
-    e.target.parentNode.classList.toggle('close')
+    e.target.parentNode.classList.toggle(CONF.itemClose)
     // toggle else
   })
 

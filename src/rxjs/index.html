@@ -38,16 +38,19 @@
       min-height: 30px;
       white-space: pre-wrap;
     }
+    .log .error {color: #f55;}
     .left, .right {
       display: inline-block;
       vertical-align: top;
       width: 50%;
     }
-    .box {
-      max-height: 500px;
+    .box pre {
+      background: rgb(40, 44, 53);
+      color: #eee;
+      max-height: 400px;
       overflow-y: auto;
     }
-    .item.close .btn{
+    .item.close .btn, .item.close .item-desc{
       display: none;
     }
     .btn-clear {line-height: 1.1;}
