@@ -1,38 +1,40 @@
 import { fromEvent } from 'rxjs'
 import { filter, map } from 'rxjs/operators'
 import {$, rewriteLog} from '../../utils/domHelper'
-import Init from './init'
-import DescDocs from './desc'
-import BaseDemo from './base'
+import Init, {CONF} from './init'
+import Modules from './data'
+import baseDemo from './base'
+import level1Demos from './level1'
 
-const Demo = Init(
-  $('.demos').el,
-  {title: 'rx base', data: BaseDemo}
-);
-console.log(Demo)
+Modules.onCreated((data) => Init($('.demos').el, data))
+const modules = new Modules([baseDemo, level1Demos])
 
 const Log = $('.log')
 const Desc = $('.description')
 rewriteLog(Log.el)
 // 全局监听 document
 const observable = fromEvent(document, 'click');
-// const subject = new Subject();
-// const multicasted = source.pipe(multicast(subject));
-observable.pipe(filter(({target}) => target.classList.contains('title') && target.parentNode.classList.contains('item')))
+observable.pipe(filter(({target}) => target.classList.contains(CONF.itemTitle)
+ && target.parentNode.classList.contains(CONF.itemCon)))
   .subscribe(e => {
     e.target.parentNode.classList.toggle('close')
     // toggle else
   })
 
-observable.pipe(filter(({target}) => target.classList.contains('btn-clear')))
+observable.pipe(filter(({target}) => target.classList.contains('clear-log')))
   .subscribe(console.clear)
 
-observable.pipe(filter(({target}) => target.classList.contains('btn')))
+observable.pipe(filter(({target}) => target.classList.contains('clear-desc')))
+  .subscribe(({target}) => {
+    Desc.el.innerHTML = ''
+  })
+
+observable.pipe(filter(({target}) => target.classList.contains(CONF.btn)))
   .pipe(map(({target}) => target.classList.item(1)))
-  .pipe(filter(key => key in Demo))
+  .pipe(filter(key => modules.has(key)))
   .subscribe(key => {
     console.clear()
-    Demo[key]()
-    Desc.el.innerHTML = `${key in DescDocs ? `${DescDocs[key]}\n` : ''}${Demo[key].toString()}`
+    const {fn, desc} = modules.get(key)
+    fn()
+    Desc.el.innerHTML = `${desc ? `${desc}\n` : ''}${fn.toString()}`
   })
-// multicasted.connect();

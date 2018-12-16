@@ -40,7 +40,11 @@ function rewriteLog(dom) {
     const msg = Array.prototype.map.call(arguments, item => {
       const type = getType(item)
       if (type === 'array' || 'object') {
-        return JSON.stringify(item, void 0, 2)
+        try {
+          return JSON.stringify(item, void 0, 2)
+        } catch(err) {
+          log(err)
+        }
       }
       return item
     }).join(' ')

@@ -26,6 +26,10 @@
       line-height: 40px;
       padding-left: 20px;
     }
+    .item-desc {
+      padding-left: 20px;
+      color: #666;
+    }
     .log, .description {
       padding: 10px;
       border: 1px solid #ccc;
@@ -54,11 +58,14 @@
       <div class="left">
         <div class="title">
           log
-          <div class="btn btn-clear">clear</div>
+          <div class="btn btn-clear clear-log">clear log</div>
         </div>
         <pre class="log"></pre>
       </div><div class="right">
-        <div class="title">描述</div>
+        <div class="title">
+          描述
+          <div class="btn btn-clear clear-desc">clear description</div>
+        </div>
         <pre class="description"></pre>
       </div>
     </div>
