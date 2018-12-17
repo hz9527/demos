@@ -85,29 +85,29 @@
   'bindCallback',
   'bindNodeCallback',
   'combineLatest',
-  'concat',
+  'concat', // down
   'defer',
   'empty',
   'forkJoin',
   'from',
-  'fromEvent',
+  'fromEvent', // down
   'fromEventPattern',
   'generate',
   'identity',
   'iif',
-  'interval',
+  'interval', // down
   'isObservable',
-  'merge',
+  'merge', // down
   'never',
   'noop',
   'of',
   'onErrorResumeNext',
-  'pairs',
-  'pipe',
+  'pairs', // down
+  'pipe', // down
   'race',
   'range',
   'throwError',
-  'timer',
+  'timer', // down
   'using',
   'zip'
 ]
@@ -150,9 +150,9 @@
   'concatMapTo',
   'count',
   'debounce',
-  'debounceTime',
+  'debounceTime', // down
   'defaultIfEmpty',
-  'delay',
+  'delay', // down
   'delayWhen',
   'dematerialize',
   'distinct',
@@ -164,9 +164,9 @@
   'exhaust',
   'exhaustMap',
   'expand',
-  'filter',
+  'filter', // down
   'finalize',
-  'find',
+  'find', // down
   'findIndex',
   'first',
   'flatMap',
@@ -174,22 +174,22 @@
   'ignoreElements',
   'isEmpty',
   'last',
-  'map',
+  'map', // down
   'mapTo',
   'materialize',
   'max',
-  'merge',
-  'mergeAll',
-  'mergeMap',
-  'mergeMapTo',
-  'mergeScan',
+  'merge', // 弃用
+  'mergeAll', // down
+  'mergeMap', // down
+  'mergeMapTo', // down
+  'mergeScan', // down
   'min',
-  'multicast',
+  'multicast', // down
   'observeOn',
   'onErrorResumeNext',
   'pairwise',
   'partition',
-  'pluck',
+  'pluck', // down
   'publish',
   'publishBehavior',
   'publishLast',
@@ -203,7 +203,7 @@
   'retryWhen',
   'sample',
   'sampleTime',
-  'scan',
+  'scan', // down
   'sequenceEqual',
   'share',
   'shareReplay',
