@@ -104,7 +104,7 @@
   'onErrorResumeNext',
   'pairs', // down
   'pipe', // down
-  'race',
+  'race', // down
   'range',
   'throwError',
   'timer', // down
@@ -144,10 +144,10 @@
   'catchError',
   'combineAll',
   'combineLatest',
-  'concat',
-  'concatAll',
-  'concatMap',
-  'concatMapTo',
+  'concat', // 弃用
+  'concatAll', // down
+  'concatMap', // down
+  'concatMapTo', // down
   'count',
   'debounce',
   'debounceTime', // down
@@ -194,7 +194,7 @@
   'publishBehavior',
   'publishLast',
   'publishReplay',
-  'race',
+  'race', // 弃用
   'reduce',
   'refCount',
   'repeat',
@@ -214,10 +214,10 @@
   'skipWhile',
   'startWith',
   'subscribeOn',
-  'switchAll',
-  'switchMap',
-  'switchMapTo',
-  'take',
+  'switchAll', // down
+  'switchMap', // down
+  'switchMapTo', // down
+  'take', // down
   'takeLast',
   'takeUntil',
   'takeWhile',
