@@ -1,17 +1,22 @@
 import {Observable, merge, interval, concat, race} from 'rxjs'
-import {take, map, mergeAll, mergeMap, mergeMapTo, mergeScan, switchAll, switchMap, mapTo} from 'rxjs/operators'
+import {take, map, mergeAll, mergeMap, mergeMapTo, mergeScan, mapTo} from 'rxjs/operators'
 
 import {DemoModule} from './data'
-const desc = `根据官网参考（REFERENCE）将整体分为 index、operators、ajax、webSocket & testing
-而 type 分为 const class function interface typeAlias
-index 主要是 生成 Observable、Subscription、Subject 及相关
-operators 则是 pipe 内的函数
-rx6 在顶级去掉了 Scheduler 的概念，个人认为，在 rx6 里本身就不需要Scheduler，或者说将其隐式分到了其他操作 Observable Subscription中
-或者说Scheduler是高阶 Observable类
-pipe 则是高阶 Observable 实例
-未完待续...(感觉还是没理解。。。)`
+const desc = `这一部分主要是对多个流大体的过程的操作，
+流的合并 merge，就像订阅了多个流，任意流 push 都能让订阅者接收，也可以控制并发数，优先高阶流 complete
+流的拼接 concat，就像一个队列一样， one by one，一个流结束才能处理下一个流
+流的初始抉择 race，当多个流，优先使用第一个相应的流（非 complete）`
 
-const level1Demos = new DemoModule('多个流处理1', desc)
+// 根据官网参考（REFERENCE）将整体分为 index、operators、ajax、webSocket & testing
+// 而 type 分为 const class function interface typeAlias
+// index 主要是 生成 Observable、Subscription、Subject 及相关
+// operators 则是 pipe 内的函数
+// rx6 在顶级去掉了 Scheduler 的概念，个人认为，在 rx6 里本身就不需要Scheduler，或者说将其隐式分到了其他操作 Observable Subscription中
+// 或者说Scheduler是高阶 Observable类
+// pipe 则是高阶 Observable 实例
+// 未完待续...(感觉还是没理解。。。)
+
+const level1Demos = new DemoModule('多个流的过程', desc)
 const register = level1Demos.createRegister()
 /** index
 *  merge concat race MergeAll ConcatAll SwitchAll concatMap mergeMap switchMap CombineLatest Zip forkJoin WithLatestFrom
@@ -174,35 +179,6 @@ register('concatMapTo-operator', () => {
   // outerObservable.pipe(mergeMapMap(innerobservable, fn, num))
 }, `1. observable 2. 数据处理器`)
 
-
-// switch (operators)
-// switchAll switchMap switchMapTo
-
-register('switch-operator', () => {
-  Observable.create(observer => {
-    setTimeout(() => observer.next('s1'), 100)
-    setTimeout(() => observer.next('s2'), 300)
-    setTimeout(() => observer.next('s3'), 1500)
-    setTimeout(() => observer.complete(), 2500)
-  }).pipe(map(v => interval(1000).pipe(take(5)))).pipe(switchAll())
-  .subscribe(v => console.log(v))
-}, `没有参数。switch 在数据竞争里比较关键。就是指当源 observable 发出新的数据就取消内部 observable 之前的订阅。
-适用场景就是优先当前请求并废弃之前正在处理的事务`)
-
-register('switchMap-operator', () => {
-  Observable.create(observer => {
-    setTimeout(() => observer.next('我来模拟第一次点击事件'), 100)
-    setTimeout(() => observer.next('我来模拟第二次点击事件'), 300)
-    setTimeout(() => observer.next('我来模拟第三次点击事件'), 1500)
-  }).pipe(switchMap((click, i) => Observable.create(observer => {
-    console.log(`第${i + 1}次点击，准备请求数据，将取消之前未返回的数据的订阅啦`)
-    setTimeout(() => observer.next(`给，这是第${i + 1}次点击的数据返回 入参${click}`), 2000 - i * 1000)
-  }))).subscribe(d => console.log(d))
-}, `参数与concat 类似，第二个参数是处理函数`)
-
-register('switchMapTo-operator', () => {
-  console.log('好像应该明白了')
-})
 
 // race (index&operator)
 register('race', () => {

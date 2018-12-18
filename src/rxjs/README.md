@@ -84,12 +84,12 @@
 [
   'bindCallback',
   'bindNodeCallback',
-  'combineLatest',
+  'combineLatest', // down
   'concat', // down
   'defer',
   'empty',
-  'forkJoin',
-  'from',
+  'forkJoin', // down
+  'from', // down
   'fromEvent', // down
   'fromEventPattern',
   'generate',
@@ -100,7 +100,7 @@
   'merge', // down
   'never',
   'noop',
-  'of',
+  'of', // down
   'onErrorResumeNext',
   'pairs', // down
   'pipe', // down
@@ -109,7 +109,7 @@
   'throwError',
   'timer', // down
   'using',
-  'zip'
+  'zip' // down
 ]
 ```
 
@@ -142,8 +142,8 @@
   'bufferToggle',
   'bufferWhen',
   'catchError',
-  'combineAll',
-  'combineLatest',
+  'combineAll', // down
+  'combineLatest', // 弃用
   'concat', // 弃用
   'concatAll', // down
   'concatMap', // down
@@ -235,8 +235,8 @@
   'windowToggle',
   'windowWhen',
   'withLatestFrom',
-  'zip',
-  'zipAll'
+  'zip', // 弃用
+  'zipAll' // down
 ]
 ```
 

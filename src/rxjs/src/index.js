@@ -5,9 +5,12 @@ import Init, {CONF} from './init'
 import Modules from './data'
 import baseDemo from './base'
 import level1Demos from './level1'
+import level2Demos from './level2'
+import level3Demos from './level3'
+import {think} from './think'
 
 Modules.onCreated((data) => Init($('.demos').el, data))
-const modules = new Modules([baseDemo, level1Demos])
+const modules = new Modules([baseDemo, level1Demos, level2Demos, level3Demos, think])
 
 const Log = $('.log')
 const Desc = $('.description')
