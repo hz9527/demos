@@ -1,4 +1,8 @@
-const arr = [
+import {DemoModule} from './data'
+
+const baseUrl = 'https://rxjs-dev.firebaseapp.com/'
+
+const data = [
   {
     "name": "index",
     "title": "index",
@@ -1534,19 +1538,8 @@ const arr = [
     ]
   }
 ]
-
-arr.forEach(item => {
-    console.log('top', item.name)
-    const Items = {}
-    item.items.forEach(info => {
-      if (info.docType in Items) {
-        Items[info.docType].push(info.title)
-      } else {
-        Items[info.docType] = [info.title]
-      }
-    })
-    Object.keys(Items).forEach(key => {
-      console.log(`item - ${key}`)
-      console.log(JSON.stringify(Items[key], void 0, 2))
-    })
-})
+export default new DemoModule('allApi', data.reduce((str, item) => {
+  str += `<div>${item.title}
+  </div>${item.items.map(info => `<a class="btn-a" href="${baseUrl}${info.path}" target="_blank">${info.title}</a>`).join('')}`
+  return str
+}, ''))

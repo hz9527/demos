@@ -179,6 +179,10 @@ register('concatMapTo-operator', () => {
   // outerObservable.pipe(mergeMapMap(innerobservable, fn, num))
 }, `1. observable 2. 数据处理器`)
 
+// exhaust exhaustMap
+// register('exhaust', () => {
+//
+// })
 
 // race (index&operator)
 register('race', () => {

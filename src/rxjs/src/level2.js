@@ -6,7 +6,7 @@ import {DemoModule} from './data'
 const desc = `这一部分主要是对多个流过程细节的操作，
 流的过程抉择 switch，一旦源消息触发，将进行新的高阶 observable 处理，并取消之前未完成的订阅
 流的消息合并 combineLatest zip`
-const level2Demos = new DemoModule('多个流的过程2', '')
+const level2Demos = new DemoModule('多个流的过程2', desc)
 const register = level2Demos.createRegister()
 
 // switch (operators)
