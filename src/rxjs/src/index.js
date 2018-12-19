@@ -8,9 +8,10 @@ import level1Demos from './level1'
 import level2Demos from './level2'
 import level3Demos from './level3'
 import {think} from './think'
+import allApi from './all'
 
 Modules.onCreated((data) => Init($('.demos').el, data))
-const modules = new Modules([baseDemo, level1Demos, level2Demos, level3Demos, think])
+const modules = new Modules([allApi, baseDemo, level1Demos, level2Demos, level3Demos, think])
 
 const Log = $('.log')
 const Desc = $('.description')
