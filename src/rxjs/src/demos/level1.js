@@ -1,7 +1,7 @@
 import {Observable, merge, interval, concat, race} from 'rxjs'
 import {take, map, mergeAll, mergeMap, mergeMapTo, mergeScan, mapTo} from 'rxjs/operators'
 
-import {DemoModule} from './data'
+import {DemoModule} from '../data'
 const desc = `这一部分主要是对多个流大体的过程的操作，
 流的合并 merge，就像订阅了多个流，任意流 push 都能让订阅者接收，也可以控制并发数，优先高阶流 complete
 流的拼接 concat，就像一个队列一样， one by one，一个流结束才能处理下一个流

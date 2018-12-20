@@ -1,7 +1,7 @@
 import {Observable, interval, combineLatest, of, zip} from 'rxjs'
 import {take, map, switchAll, switchMap,combineAll} from 'rxjs/operators'
 
-import {DemoModule} from './data'
+import {DemoModule} from '../data'
 
 const desc = `这一部分主要是对多个流过程细节的操作，
 流的过程抉择 switch，一旦源消息触发，将进行新的高阶 observable 处理，并取消之前未完成的订阅

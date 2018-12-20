@@ -1,4 +1,4 @@
-import {DemoModule} from './data'
+import {DemoModule} from '../data'
 
 const baseUrl = 'https://rxjs-dev.firebaseapp.com/'
 

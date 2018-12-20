@@ -1,4 +1,4 @@
-import {DemoModule} from './data'
+import {DemoModule} from '../data'
 
 const desc = `通过一系列学习，相信有了一些思考，比如流流程处理，流之间处理
 思考1:点赞业务

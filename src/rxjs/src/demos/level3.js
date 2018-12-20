@@ -1,7 +1,7 @@
 import {Observable, interval, forkJoin, of} from 'rxjs'
 import {take, map} from 'rxjs/operators'
 
-import {DemoModule} from './data'
+import {DemoModule} from '../data'
 const level3Demos = new DemoModule('多个流结果的处理', '')
 const register = level3Demos.createRegister()
 

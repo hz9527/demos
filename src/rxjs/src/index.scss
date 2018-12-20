@@ -1,0 +1,55 @@
+body, html {
+  margin: 0;
+  padding: 0;
+  color: #333;
+}
+.btn {
+  display: inline-block;
+  padding: 5px 10px;
+  border-radius: 3px;
+  background-color: #f55;
+  color: #fff;
+  margin: 5px;
+  cursor: pointer;
+  user-select: none;
+}
+.item {padding: 5px;}
+.title {
+  background-color: #ccc;
+  line-height: 40px;
+  padding-left: 20px;
+}
+.item-desc {
+  padding-left: 20px;
+  color: #666;
+}
+.log, .description {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  margin: 10px;
+  min-height: 30px;
+  white-space: pre-wrap;
+}
+.log .error {color: #f55;}
+.left, .right {
+  display: inline-block;
+  vertical-align: top;
+  width: 50%;
+}
+.box pre {
+  background: rgb(40, 44, 53);
+  color: #eee;
+  max-height: 400px;
+  overflow-y: auto;
+}
+.item.close .btn, .item.close .item-desc{
+  display: none;
+}
+.btn-clear {line-height: 1.1;}
+.btn-a {
+  display: inline-block;
+  margin: 5px;
+  text-decoration: none;
+  color: #f55;
+}

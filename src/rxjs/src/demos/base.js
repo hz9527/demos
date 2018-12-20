@@ -1,7 +1,7 @@
 // 浅尝 rxjs
 import {Observable, Subject} from 'rxjs'
 import {filter, multicast, map, debounceTime} from 'rxjs/operators'
-import {DemoModule} from './data'
+import {DemoModule} from '../data'
 // 1. Obsevable 可观察，比如一个函数能生产数据，当这些数据不被消费，就会搁置，直到被消费
 // 2. Observer
 // 3. Subscription

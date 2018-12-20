@@ -1,14 +1,15 @@
 import { fromEvent } from 'rxjs'
 import { filter, map } from 'rxjs/operators'
+import './index.scss'
 import {$, rewriteLog} from '../../utils/domHelper'
 import Init, {CONF} from './init'
 import Modules from './data'
-import baseDemo from './base'
-import level1Demos from './level1'
-import level2Demos from './level2'
-import level3Demos from './level3'
-import {think} from './think'
-import allApi from './all'
+import baseDemo from './demos/base'
+import level1Demos from './demos/level1'
+import level2Demos from './demos/level2'
+import level3Demos from './demos/level3'
+import {think} from './demos/think'
+import allApi from './demos/all'
 
 Modules.onCreated((data) => Init($('.demos').el, data))
 const modules = new Modules([allApi, baseDemo, level1Demos, level2Demos, level3Demos, think])
