@@ -1,5 +1,5 @@
-import {fromEvent} from 'rxjs'
-import {filter, map, scan} from 'rxjs/operators'
+import {fromEvent, timer, of, combineLatest, zip} from 'rxjs'
+import {filter, map, scan, switchMap, delay, concatAll, switchAll} from 'rxjs/operators'
 import {$, checkEnums} from './utils'
 
 const Data = [
@@ -57,32 +57,21 @@ const setState = ((likeData) => {
 
 const Source = fromEvent($('.demo-like'), 'click')
   .pipe(filter(({target}) => target.classList.contains('btn')))
-  .pipe(map(({target: {dataset: {index}}}) => Number(index)))
-  .pipe(scan((data, id) => {
-    data.pre = data.cur
-    data.cur = id
-    return data
-  }, {pre: null, cur: null}))
-  .subscribe(() => {
-    Data[0].state = 1
-    Data[0].counts = 2
-    Data[0].extraClass.hide = false
-    Data[0].extraClass.beforeEnter = true
-    setState(Data)
+  .pipe(map(({target: {dataset: {index}}}) => index))
 
-    setTimeout(() => {
-      Data[0].extraClass.beforeEnter = false
-      setState(Data)
-    }, 300)
+// 点击 -》判断该点上次点击是否过期，过期 toggle 否则 显示点赞动画，如果是第一次点击 从 0 开始计数，否则++
 
-    setTimeout(() => {
-      Data[0].extraClass.beforeHide = true
-      setState(Data)
-    }, 3000)
+// 对各自 id swithchMap，所以每次会针对该 id 发布一个流，并允许各自 switchMap
+const DebounceTime = 800
+const AddSource = Source.pipe(scan((act, id) => {
+  act.push(id)
+  return act
+}, []))
 
-    setTimeout(() => {
-      Data[0].extraClass.beforeHide = false
-      Data[0].extraClass.hide = true
-      setState(Data)
-    }, 3300)
+const DelaySource = AddSource.pipe(delay(DebounceTime))
+  .subscribe(act => {
+    const id = act.shift()
+    if (act.indexOf(id) === -1) {
+      console.log('stop', id)
+    }
   })
