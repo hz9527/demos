@@ -5,6 +5,7 @@ body, html {
 body {
   background: #eee;
   font-size: 13px;
+  color: #333;
 }
 .demo-item {
   margin: 10px;
@@ -56,6 +57,36 @@ body {
     .beforeEnter {opacity: 0;}
     .beforeHide {opacity: 0;}
     .hide {display: none;}
+  }
+}
+
+.demo-input {
+  .input {
+    margin: 0;
+    outline: none;
+    padding: 5px;
+    border-radius: 3px;
+    border: 1px solid #ccc;
+    color: #333;
+    &:focus {
+      border-color: #f55;
+    }
+  }
+  .input-box {
+    position: relative;
+    .input-list {
+      display: none;
+      position: absolute;
+      background: #ccc;
+      padding: 5px 10px;
+      top: 100%;
+      left: 0;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    .input-show {
+      display: block;
+    }
   }
 }
 

@@ -11,12 +11,12 @@
 
 ### 基本概念
 
-1. Observable 可观察对象
-1. Observer 观察者
-1. Subsription 订阅
-1. Operators 操作符
-1. Subject 主体
-1. Schedulers 调度器
+1.  Observable 可观察对象
+2.  Observer 观察者
+3.  Subsription 订阅
+4.  Operators 操作符
+5.  Subject 主体
+6.  Schedulers 调度器
 
 ### 推拉的概念
 
@@ -25,7 +25,9 @@
 拉数据是消费者主动实行的，从而触发生产者生产；推数据是生产者主动实行的，从而触发消费者消费
 
 ## rxjs api
+
 [operators](#operators)
+
 ### index
 
 **const**
@@ -128,6 +130,7 @@
   'TeardownLogic'
 ]
 ```
+
 ### operators
 
 **function**
@@ -256,6 +259,7 @@
 `[ajaxresponse]`
 
 ### websocket
+
 **function**
 `[websocket]`
 
@@ -271,9 +275,10 @@
 `[testscheduler]`
 
 ## rxjs 思想
+
 ## rxjs 总结
 
 ## demo
 
-- [ ] 输入框at
-- [ ] 电梯调度
+-   [ ] 输入框at
+-   [ ] 电梯调度

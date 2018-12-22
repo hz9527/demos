@@ -1,8 +1,9 @@
-import {fromEvent, timer, of, combineLatest, zip} from 'rxjs'
-import {filter, map, scan, switchMap, delay, concatAll, switchAll} from 'rxjs/operators'
-import {$, checkEnums} from './utils'
-
-const Data = [
+import {timer} from 'rxjs'
+import {$, checkEnums} from '../utils'
+export const DebounceTime = 800
+export const HideTime = 300
+export const EnterTime = 20
+export const Data = [
   {state: 0, counts: -1, extraClass: {breath: false, beforeHide: false, beforeEnter: false, hide: true}},
   {state: 0, counts: -1, extraClass: {breath: false, beforeHide: false, beforeEnter: false, hide: true}}
 ]
@@ -55,23 +56,43 @@ const setState = ((likeData) => {
   }
 })(Data)
 
-const Source = fromEvent($('.demo-like'), 'click')
-  .pipe(filter(({target}) => target.classList.contains('btn')))
-  .pipe(map(({target: {dataset: {index}}}) => index))
+const Executor = {
+  toggle(ind) {
+    Data[ind].state = Data[ind].state === 0 ? 1 : 0
+    Data[ind].counts = Data[ind].state === 0 ? -1 : 0
+    setState(Data)
+  },
+  show(ind) {
+    Data[ind].state = 1
+    Data[ind].counts = 1
+    Data[ind].extraClass.beforeEnter = true
+    Data[ind].extraClass.hide = false
+    setState(Data)
+    timer(EnterTime).subscribe(() => {
+      Data[ind].extraClass.beforeEnter = false
+      Data[ind].extraClass.breath = true
+      setState(Data)
+    })
+  },
+  change(ind) {
+    Data[ind].counts++
+    setState(Data)
+  },
+  beforeHide(ind) {
+    Data[ind].extraClass.beforeHide = true
+    Data[ind].extraClass.breath = false
+    setState(Data)
+  },
+  cancelHide(ind) {
+    Data[ind].extraClass.beforeHide = false
+    Data[ind].extraClass.breath = true
+    setState(Data)
+  },
+  hide(ind) {
+    Data[ind].extraClass.hide = true
+    Data[ind].extraClass.beforeHide = false
+    setState(Data)
+  }
+}
 
-// 点击 -》判断该点上次点击是否过期，过期 toggle 否则 显示点赞动画，如果是第一次点击 从 0 开始计数，否则++
-
-// 对各自 id swithchMap，所以每次会针对该 id 发布一个流，并允许各自 switchMap
-const DebounceTime = 800
-const AddSource = Source.pipe(scan((act, id) => {
-  act.push(id)
-  return act
-}, []))
-
-const DelaySource = AddSource.pipe(delay(DebounceTime))
-  .subscribe(act => {
-    const id = act.shift()
-    if (act.indexOf(id) === -1) {
-      console.log('stop', id)
-    }
-  })
+export default Executor

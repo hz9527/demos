@@ -1,9 +1,7 @@
 import './index.scss'
-import './like'
+import './atlist/index'
+import './like/like'
 // input
-/******
-* 点赞 *
-*******/
 
 
 // 大图
